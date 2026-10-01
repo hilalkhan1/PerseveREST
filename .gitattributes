@@ -1,0 +1,2 @@
+# Linux line endings everywhere: the scripts and the Dockerfile run in Linux containers
+* text=auto eol=lf

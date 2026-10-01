@@ -1,0 +1,13 @@
+# Build outputs
+build/
+.gradle/
+out/
+*.class
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log

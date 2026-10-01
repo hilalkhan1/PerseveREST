@@ -1,0 +1,47 @@
+PerseveREST
+Copyright 2026 <AUTHOR NAMES>
+
+PerseveREST is based on RestTestGen 25.12 (https://github.com/SeUniVr/RestTestGen), by the Software
+Engineering research group of the University of Verona, licensed under the Apache License, Version 2.0
+(see LICENSE). PerseveREST is distributed under the same license.
+
+Files added by PerseveREST (in source/src/main/java/io/resttestgen/):
+  implementation/strategy/PerseveRESTStrategy.java
+  implementation/helper/ResourceCountLimiter.java
+  implementation/helper/CombinedSchemaResolver.java
+  implementation/helper/ResourceIdMemory.java
+  implementation/helper/MalformedRequestSender.java
+  implementation/helper/PrimitiveRequestBody.java
+  implementation/interactionprocessor/TokenInteractionProcessor.java
+  implementation/interactionprocessor/ResourceIdInteractionProcessor.java
+and their unit tests (in source/src/test/java/io/resttestgen/):
+  implementation/strategy/TestPerseveRESTStrategy.java
+  implementation/helper/TestResourceCountLimiter.java
+  implementation/helper/TestCombinedSchemaResolver.java
+  implementation/helper/TestCombinedSchemasPetClinic.java
+  implementation/helper/TestResourceIdMemory.java
+  implementation/helper/TestMalformedRequestSender.java
+  implementation/interactionprocessor/TestTokenInteractionProcessor.java
+  implementation/fuzzer/TestNominalFuzzerOptionalLeaves.java
+  core/dictionary/TestBoundedDictionary.java
+  implementation/helper/TestPrimitiveRequestBody.java
+
+Files of RestTestGen modified by PerseveREST (each marked with a "Modified for PerseveREST" comment):
+  core/testing/TestRunner.java
+  core/dictionary/Dictionary.java
+  core/dictionary/DictionaryEntry.java
+  core/helper/ExtendedRandom.java
+  core/openapi/Operation.java
+  core/datatype/parameter/combined/AllOfParameter.java
+  core/datatype/parameter/combined/AnyOfParameter.java
+  core/datatype/parameter/combined/OneOfParameter.java
+  core/datatype/parameter/visitor/CombinedSchemasVisitor.java
+  core/datatype/parameter/leaves/LeafParameter.java
+  boot/AuthenticationInfo.java
+  implementation/fuzzer/NominalFuzzer.java
+  implementation/parametervalueprovider/single/RandomParameterValueProvider.java
+  implementation/parametervalueprovider/single/ExamplesParameterValueProvider.java
+  (test) core/helper/TestExtendedRandom.java
+
+The unit tests use three OpenAPI specifications of RESTgym (https://github.com/SeUniVr/RESTgym), in
+source/apis/.test-apis/restgym-pet-clinic/ (Spring PetClinic REST), restgym-erc20/ and restgym-gestao-hospital/.
