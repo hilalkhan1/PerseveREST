@@ -23,6 +23,11 @@ server errors with new messages, and avoids crashing or blocking the API under t
 - **Malformed requests.** Once per operation, PerseveREST also sends a few malformed variants of one of its requests
   (without body, with empty, truncated or invalid JSON, with other content types, with a trailing slash), which test
   how the API handles requests that never reach its business logic.
+- **Invalid values, field by field.** Once per operation, every property of a request body (up to 20), every
+  query parameter and every path parameter gets invalid values for its kind: null, empty and very long strings,
+  values of another JSON type, numbers too large for any numeric type, negative and decimal numbers. RestTestGen's
+  mutators change one random parameter at a time, so the code that reads most fields was never reached with
+  invalid values. Numbers of amounts of resources never get huge values.
 - **Valid request bodies for combined schemas.** Schemas combined with `allOf` are merged, and one schema is chosen
   for `oneOf` and `anyOf`, before generating values. RestTestGen 25.12 did not resolve them, so bodies built from
   them were malformed (e.g., `{"name": "Leo", "type": }` for the pets of Spring PetClinic), and it discarded request
@@ -82,7 +87,8 @@ files). The unit tests of PerseveREST's changes run in `source/` with:
 ```
 gradle test --tests '*TestPerseveRESTStrategy' --tests '*TestResourceCountLimiter' --tests '*TestResourceIdMemory' \
     --tests '*TestCombinedSchemaResolver' --tests '*TestCombinedSchemasPetClinic' --tests '*TestMalformedRequestSender' \
-    --tests '*TestTokenInteractionProcessor' --tests '*TestNominalFuzzerOptionalLeaves' --tests '*TestExtendedRandom' \n    --tests '*TestBoundedDictionary' --tests '*TestPrimitiveRequestBody'
+    --tests '*TestTokenInteractionProcessor' --tests '*TestNominalFuzzerOptionalLeaves' --tests '*TestExtendedRandom' \
+    --tests '*TestBoundedDictionary' --tests '*TestPrimitiveRequestBody' --tests '*TestFieldVariantSender'
 ```
 
 ## Authors

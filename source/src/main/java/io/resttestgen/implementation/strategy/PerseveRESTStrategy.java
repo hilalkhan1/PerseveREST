@@ -13,6 +13,7 @@ import io.resttestgen.core.testing.TestSequence;
 import io.resttestgen.core.testing.TestStatus;
 import io.resttestgen.implementation.fuzzer.IntensificationFuzzer;
 import io.resttestgen.implementation.fuzzer.NominalFuzzer;
+import io.resttestgen.implementation.helper.FieldVariantSender;
 import io.resttestgen.implementation.helper.MalformedRequestSender;
 import io.resttestgen.implementation.operationssorter.GraphBasedOperationsSorter;
 import org.apache.logging.log4j.LogManager;
@@ -181,6 +182,9 @@ public class PerseveRESTStrategy extends Strategy {
         malformedVariantsSent.add(operation);
         for (String serverErrorBody : MalformedRequestSender.sendVariants(interaction)) {
             registerFault(serverErrorBody, operation + " (malformed request)");
+        }
+        for (String serverErrorBody : FieldVariantSender.sendVariants(interaction)) {
+            registerFault(serverErrorBody, operation + " (field variant)");
         }
     }
 

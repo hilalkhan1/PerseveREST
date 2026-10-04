@@ -64,15 +64,29 @@ public class MalformedRequestSender {
         HttpUrl otherPath = url.newBuilder().encodedPath(path.endsWith("/") && path.length() > 1 ?
                 path.substring(0, path.length() - 1) : path + "/").build();
         variants.add(request(otherPath, method, headers, hasBody ? RequestBody.create(body, JSON) : null));
+        // Responses asked in formats that the API does not produce
+        for (String accept : List.of("application/xml", "text/csv")) {
+            variants.add(request(url, method, headers.newBuilder().set("Accept", accept).build(),
+                    hasBody ? RequestBody.create(body, JSON) : null));
+        }
+        serverErrorBodies.addAll(executeAll(variants, interaction.getFuzzedOperation()));
+        return serverErrorBodies;
+    }
 
-        for (Request request : variants) {
+    /**
+     * Executes the requests (variants of a request of the given operation).
+     * @return the bodies of the responses with a server error status.
+     */
+    static List<String> executeAll(List<Request> requests, Object operation) {
+        List<String> serverErrorBodies = new ArrayList<>();
+        for (Request request : requests) {
             try (Response response = client.newCall(request).execute()) {
                 if (response.code() >= 500) {
                     ResponseBody responseBody = response.body();
                     serverErrorBodies.add(responseBody != null ? responseBody.string() : "");
                 }
             } catch (IOException | RuntimeException e) {
-                logger.debug("Malformed variant of {} not executed: {}", interaction.getFuzzedOperation(), e.getMessage());
+                logger.debug("Variant of {} not executed: {}", operation, e.getMessage());
             }
         }
         return serverErrorBodies;
@@ -93,7 +107,7 @@ public class MalformedRequestSender {
         return bodies;
     }
 
-    private static Request request(HttpUrl url, String method, Headers headers, RequestBody body) {
+    static Request request(HttpUrl url, String method, Headers headers, RequestBody body) {
         // Methods like POST require a body in OkHttp: an empty one stands for "no body"
         if (body == null && (method.equals("POST") || method.equals("PUT") || method.equals("PATCH"))) {
             body = RequestBody.create(new byte[0], null);

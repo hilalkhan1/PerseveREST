@@ -12,6 +12,7 @@ Files added by PerseveREST (in source/src/main/java/io/resttestgen/):
   implementation/helper/ResourceIdMemory.java
   implementation/helper/MalformedRequestSender.java
   implementation/helper/PrimitiveRequestBody.java
+  implementation/helper/FieldVariantSender.java
   implementation/interactionprocessor/TokenInteractionProcessor.java
   implementation/interactionprocessor/ResourceIdInteractionProcessor.java
 and their unit tests (in source/src/test/java/io/resttestgen/):
@@ -25,6 +26,7 @@ and their unit tests (in source/src/test/java/io/resttestgen/):
   implementation/fuzzer/TestNominalFuzzerOptionalLeaves.java
   core/dictionary/TestBoundedDictionary.java
   implementation/helper/TestPrimitiveRequestBody.java
+  implementation/helper/TestFieldVariantSender.java
 
 Files of RestTestGen modified by PerseveREST (each marked with a "Modified for PerseveREST" comment):
   core/testing/TestRunner.java
