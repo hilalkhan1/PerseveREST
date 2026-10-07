@@ -69,10 +69,97 @@ server errors with new messages, and avoids crashing or blocking the API under t
 
 ## Building and running with RESTgym
 
-1. Copy this folder into RESTgym as `tools/perseverest/` (the folder name is the tool slug), e.g., from RESTgym's
-   folder: `git clone https://github.com/hilalkhan1/PerseveREST.git tools/perseverest`.
-2. Make sure `restgym-tool-config.yml` contains `enabled: true`.
-3. Build the images (`./restgym.sh build-images`) and run the experiment (`./restgym.sh launch-experiment`).
+PerseveREST runs in [RESTgym](https://github.com/SeUniVr/RESTgym), the infrastructure of REST League: RESTgym starts
+the API under test and the tool in Docker containers, records every request and response, and measures the results.
+
+### Requirements
+
+- Docker, installed and running, on Linux, macOS, or Windows with WSL2 (Ubuntu). On Windows, keep RESTgym inside the
+  Linux file system (e.g., `~/RESTgym`), not on a Windows drive (`/mnt/c/...`): Docker is slow there, and RESTgym's
+  result databases are unreliable.
+- At least 4 CPU cores and 8 GB of RAM (16 GB recommended), about 50 GB of disk space for the images of the APIs,
+  and an Internet connection (the images of the APIs, and the libraries of PerseveREST, are downloaded when the
+  images are built).
+
+### Steps
+
+1. Get RESTgym with its APIs (they are Git submodules):
+
+   ```
+   git clone --recurse-submodules https://github.com/SeUniVr/RESTgym.git
+   cd RESTgym
+   ```
+
+2. Add PerseveREST as a tool (the name of the folder is the name of the tool in RESTgym):
+
+   ```
+   git clone https://github.com/hilalkhan1/PerseveREST.git tools/perseverest
+   ```
+
+3. Choose what to run. RESTgym runs every enabled tool on every enabled API:
+   - `restgym-config.yml`: `time_budget_mins` is the length of each run (60 minutes in REST League; e.g., 10 for a
+     quick test);
+   - `apis/<api>/restgym-api-config.yml`: `enabled: true` for the APIs to test (e.g., `pet-clinic`,
+     `notebook-manager`, `kafka-rest-proxy`), `enabled: false` for the others;
+   - `tools/<tool>/restgym-tool-config.yml`: `enabled: true` only for `perseverest` (`tools/perseverest` already has
+     it; other tools, e.g., `deeprest` and `restler`, are enabled by default).
+
+4. Build the Docker images (answer `2`, "Build images"). PerseveREST is compiled from its source code here:
+
+   ```
+   ./restgym.sh build-images
+   ```
+
+5. Run the experiment (answer the number of repetitions, e.g., `1`, then press ENTER). Each run lasts the time
+   budget plus a few minutes, one tool and API at a time:
+
+   ```
+   ./restgym.sh launch-experiment
+   ```
+
+6. Check the runs (press ENTER, then answer `no` twice, so that no run is deleted), and compute the results
+   (answer `2`, "Analyze only newly completed and verified runs"):
+
+   ```
+   ./restgym.sh verify-data
+   ./restgym.sh analyze-data
+   ```
+
+`./restgym.sh force-stop` stops an experiment (it stops and removes all RESTgym containers).
+
+### Where the results are
+
+Each run has a folder `results/<api>/perseverest/run-<date>-<time>/` in RESTgym:
+
+| File | Content |
+|---|---|
+| `summary.json` | Results of the run (after `analyze-data`): requests, 2XX/4XX/5XX responses, covered operations, unique 5XX (distinct server errors), branch, line and method coverage of the API |
+| `results.db` | Every request and response, with their times (SQLite database, e.g., for DB Browser for SQLite) |
+| `logs/perseverest-stdout.log` | Log of PerseveREST: rounds, explored faults, warnings |
+| `logs/<api>-stdout.log` | Log of the API under test (e.g., the stack traces of its server errors) |
+| `code-coverage/` | Code coverage of the API (JaCoCo), sampled every few seconds |
+| `started.txt`, `completed.txt`, `verified.txt` | Progress of the run |
+
+After `analyze-data`, `results/time_budget_aggregated_results_<date>.csv` contains the results of all analyzed runs,
+one row per run (e.g., to open with a spreadsheet).
+
+### Watching a run
+
+- `docker ps` lists the containers of the running experiment: `restgym--perseverest-for-<api>--run-<id>`
+  (PerseveREST), `restgym--<api>-for-perseverest--run-<id>` (the API) and RESTgym's launcher.
+- `docker logs -f restgym--perseverest-for-<api>--run-<id>` shows the log of PerseveREST while it runs (e.g.,
+  `PerseveREST: round 12 started`).
+- `docker stats` shows the CPU and memory used by each container.
+
+### Notes
+
+- Some APIs need more resources than others: at the end of a 60-minute run on `flight-search`, RESTgym reads the
+  whole log of the API (several GB) into memory, which failed on our machine with 7.6 GB of RAM for Docker (the
+  results of the run were complete, but `completed.txt` was missing); `genome-nexus` needs more than 5 GB of RAM to start.
+- `gestao-hospital` geocodes the addresses of hospitals with an external service (LocationIQ), with a key shared by
+  everyone who runs the API: when its daily quota is used up, hospitals cannot be created, whatever the tool.
+
+### How the image is built
 
 The `Dockerfile` compiles the source code in `source/` (Gradle 8.14, Java 17; the build downloads the dependencies
 from Maven Central) and runs PerseveREST on `eclipse-temurin:24-jre-alpine`. At run time the tool reads `API`,
