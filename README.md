@@ -180,7 +180,8 @@ gradle test --tests '*TestPerseveRESTStrategy' --tests '*TestResourceCountLimite
 
 ## Authors
 
-<AUTHOR NAMES, AFFILIATION, CONTACT EMAIL>
+- Hilal Khan, AI and Automation Engineer, Digital Ten X (contact: hilalkhan.ai.dev@gmail.com)
+- Aamir Akbar, Postdoctoral Researcher, Lero, University of Limerick, Ireland (aamir.akbar@ul.ie)
 
 ## License
 
