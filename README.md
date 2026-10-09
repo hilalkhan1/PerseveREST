@@ -83,9 +83,11 @@ the API under test and the tool in Docker containers, records every request and 
 
 ### Steps
 
-1. Get RESTgym with its APIs (they are Git submodules):
+1. Get RESTgym with its APIs. They are Git submodules registered with SSH addresses (`git@github.com:...`), which
+   fail without a GitHub SSH key, so first tell Git to use HTTPS for GitHub:
 
    ```
+   git config --global url."https://github.com/".insteadOf "git@github.com:"
    git clone --recurse-submodules https://github.com/SeUniVr/RESTgym.git
    cd RESTgym
    ```
